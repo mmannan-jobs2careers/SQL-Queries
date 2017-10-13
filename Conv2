@@ -1,0 +1,79 @@
+select conversion2_time Conv, ip_address IP
+where campaign_id = 2684
+and conversion2_time >='2017-09-13'
+and conversion2_time <'2017-09-16'
+and segment_id = 337771
+group by conversion2_time;
+
+*******************************************************************************************
+select job_reference, sum(conversion2) conversion2, time, user from
+(
+select
+job_reference,
+sum(if(conversion2_time is null, 0, 1)) conversion2,
+conversion2_time time,
+ip_address user
+from clicks2
+where campaign_id = 6630
+and conversion2_time >='2017-09-01'
+and conversion2_time < '2017-10-01'
+and segment_id = 337771
+group by time
+UNION ALL
+select
+job_reference,
+sum(if(conversion2_time is null, 0, 1)) conversion2,
+conversion2_time time,
+ip_address user
+from affiliate_clicks
+where campaign_id = 6630
+and conversion2_time >='2017-09-01'
+and conversion2_time < '2017-10-01'
+and segment_id = 337771
+group by time
+) A
+where conversion2=1
+group by time;
+****************************************************************************************************************
+
+select job_reference, sum(Clicks) Clicks, sum(Conversion+Conversion2+Conversion3) Conversions, round (sum(conversion2)/sum(Clicks),2) CR, round(sum(Spend)/sum(Clicks),2) eCPC from
+(
+select
+ job_reference,
+ count(*) Clicks,
+ round(sum(price/100),2) Spend,
+ sum(if(conversion_time is null, 0, 1)) Conversion,
+ sum(if(conversion2_time is null, 0, 1)) Conversion2,
+ sum(if(conversion3_time is null, 0, 1)) Conversion3
+ from clicks2
+ where campaign_id = 2684
+ and segment_id = 29748
+ and click_time >= '2017-09-01'
+ group by job_reference
+UNION ALL
+select
+ job_reference,
+ count(*) Clicks,
+ round(sum(price/100),2) Spend,
+ sum(if(conversion_time is null, 0, 1)),
+ sum(if(conversion2_time is null, 0, 1)),
+ sum(if(conversion3_time is null, 0, 1))
+ from affiliate_clicks
+ where campaign_id = 2684
+ and segment_id = 29748
+ and click_time >= '2017-09-01'
+ group by job_reference
+) A
+group by job_reference;
+
+******************************************************************************************
+Select *
+from transactions
+where customer_id in (3024, 3029, 2810, 2874, 2820, 2813, 2814, 2996, 2967, 2968, 2821, 2995, 2860, 2806, 2975, 3018, 2818, 2804, 2965, 3004, 2844, 2974, 2832, 3014, 2833, 2984, 2901, 2834, 2808, 2825, 2828, 2969, 2916, 2943, 2917, 2875, 3040, 2940, 2892)
+and auth_time >='2017-09-01' and auth_time <'2017-10-01';
+
+*********************************************************************************************
+
+select job_reference, ip_address, first_name, last_name, aff_id
+from job_applications
+where campaign_id = 8683 and charged = 1;
